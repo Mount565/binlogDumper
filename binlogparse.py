@@ -4,7 +4,8 @@ from pymysqlreplication.event import BinLogEvent, GtidEvent, QueryEvent, BeginLo
 from pymysqlreplication.row_event import UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent
 
 # Before running this script, it is advised to run flush logs on the master. So that the master
-# start to write binlog events in a new file. This script dump all the binlog events in the current binlog file.
+# start to write binlog events in a new file.
+# This script by default dump all the binlog events in the current binlog file.
 
 # the file holds rollback sql(DML)
 rollback_sql = "rollback.sql"
@@ -14,13 +15,26 @@ bin_sql = "bin.sql"
 
 # The privileges needed for the user
 # GRANT REPLICATION SLAVE, REPLICATION CLIENT, SELECT ON *.* TO 'test'@'host'
-
+# Change the host and user credential to fit your database
 mysql_strings = {'host': '192.168.216.146', 'port': 3306, 'user': 'test', 'passwd': 'test'}
 
 only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent, BeginLoadQueryEvent,
                ExecuteLoadQueryEvent]
 
-stream = pm.BinLogStreamReader(connection_settings=mysql_strings, server_id=12, blocking=True, only_events=only_events)
+only_tables = None
+
+only_schemas = None
+
+# The binlog file and position to start to replicate with
+# You may need to change these two variables
+bin_log_file = 'stg-cs7-test-bin.000070'
+start_position = 4
+
+stream = pm.BinLogStreamReader(connection_settings=mysql_strings, resume_stream=False, server_id=12, blocking=True,
+                               log_file=bin_log_file,
+                               log_pos=start_position,
+                               only_schemas=only_schemas, only_tables=only_tables,
+                               only_events=only_events)
 
 print("connected to master... ")
 
