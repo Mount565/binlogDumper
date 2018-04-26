@@ -8,6 +8,7 @@ Before running this script, it is advised to run flush logs on the master(of cou
 You can also specify the binlog and position to start to replicate with. In this case you need to change the following variables:
 
 bin_log_file = 'stg-cs7-test-bin.000070'
+
 start_position = 4
 
 To filter tables and schemas, fill the following array variables:
