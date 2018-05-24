@@ -7,4 +7,18 @@ Before running this script, it is advised to run flush logs on the master(of cou
 
 How to use it
 
-eg: binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1
+Install Python3.5
+
+wget -c https://www.python.org/ftp/python/3.5.4/Python-3.5.4.tgz
+tar xzf Python-3.5.4.tgz
+cd Python-3.5.4
+./configure
+make
+make install
+
+ln -s /usr/local/bin/python3.5 /usr/bin/python3
+ln -s /usr/local/bin/pip3 /usr/bin/pip3
+
+pip3 install mysql-replication
+
+python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1
