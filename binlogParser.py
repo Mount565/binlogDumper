@@ -191,7 +191,7 @@ def get_arg_value(arglist, arg):
 
 def usage():
     print("Usage:")
-    print("binlog_dump.py ")
+    print("binlogParser.py ")
     print("    --host        # master host ip [necessary]")
     print("    --port        # master host port [necessary]")
     print("    --user        # the user to connect to master [necessary]")
