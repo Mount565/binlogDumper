@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import pymysqlreplication as pm
 import datetime
 import sys, getopt, os
