@@ -1,5 +1,5 @@
 # binlogDumper
-Dump mysql binlog and decode them to plain sql and rollback sql
+Dump mysql binlog and decode them to plain sql and rollback sql IN REAL TIME!
 
 This program depends on pymysqlreplication and tested on python 3.5!
 
