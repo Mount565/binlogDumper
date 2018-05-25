@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import pymysqlreplication as pm
 import datetime
+import threading, time
 import sys, getopt, os
 from pymysqlreplication.event import BinLogEvent, GtidEvent, QueryEvent, BeginLoadQueryEvent, ExecuteLoadQueryEvent
 from pymysqlreplication.row_event import UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent
@@ -105,6 +106,15 @@ class BinlogDump(object):
         with open(file, 'a', encoding='utf-8') as f:
             f.writelines(sql)
 
+    def rotate_sqlfile(self):
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        # the file holds rollback sql(DML)
+        self.rollback_sql = os.path.join(self.sqlDir, "rollback_%s.sql" % today)
+
+        # the file holds sql executed
+        self.bin_sql = os.path.join(self.sqlDir, "bin_%s.sql" % today)
+
+
     def process_stream(self):
 
         stream = pm.BinLogStreamReader(connection_settings=self.connect_strings, resume_stream=False,
@@ -206,6 +216,15 @@ def usage():
     print("    --onlyTables  # only dump sqls that change these tables")
     print("    --onlySchemas # only dump sqls that executed on these schemas")
 
+# start a thread to rotate output sql file everyday
+def rotate_thread(d):
+    while True:
+        current_time = time.localtime(time.time())
+        if current_time.tm_hour == 0 and current_time.tm_min == 0 and current_time.tm_sec == 0:
+            d.rollback_sql()
+            print("Output sql file rotated.")
+        time.sleep(2)
+        print("rotate thread wake up.")
 
 
 if __name__ == '__main__':
@@ -222,6 +241,8 @@ if __name__ == '__main__':
                         serverId=int(get_arg_value(argv, "--serverId")), startFile=get_arg_value(argv, "--startFile"),
                         startPos=get_arg_value(argv, "--startPos"), onlySchemas=get_arg_value(argv, "--onlySchemas"),
                         onlyTables=get_arg_value(argv, "--onlyTables"))
+    t = threading.Thread(target=rotate_thread, name="rotate_thread",args=[dumper])
+    t.start()
+
 
     dumper.process_stream()
-
