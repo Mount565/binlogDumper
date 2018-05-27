@@ -223,8 +223,8 @@ def rotate_thread(d):
         if current_time.tm_hour == 0 and current_time.tm_min == 0 and current_time.tm_sec == 0:
             d.rollback_sql()
             print("Output sql file rotated.")
-        time.sleep(2)
-        print("rotate thread wake up.")
+        time.sleep(1)
+        #print("rotate thread wake up.")
 
 
 if __name__ == '__main__':
