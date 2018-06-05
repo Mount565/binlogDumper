@@ -221,7 +221,7 @@ def rotate_thread(d):
     while True:
         current_time = time.localtime(time.time())
         if current_time.tm_hour == 0 and current_time.tm_min == 0 and current_time.tm_sec == 0:
-            d.rollback_sql()
+            d.rotate_sqlfile()
             print("Output sql file rotated.")
         time.sleep(1)
         #print("rotate thread wake up.")
@@ -241,7 +241,7 @@ if __name__ == '__main__':
                         serverId=int(get_arg_value(argv, "--serverId")), startFile=get_arg_value(argv, "--startFile"),
                         startPos=get_arg_value(argv, "--startPos"), onlySchemas=get_arg_value(argv, "--onlySchemas"),
                         onlyTables=get_arg_value(argv, "--onlyTables"))
-    t = threading.Thread(target=rotate_thread, name="rotate_thread",args=[dumper])
+    t = threading.Thread(target=rotate_thread, name="rotate_thread",args=(dumper,))
     t.start()
 
 
