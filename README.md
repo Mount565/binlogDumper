@@ -30,4 +30,6 @@ GRANT REPLICATION SLAVE, REPLICATION CLIENT, SELECT ON \*.\* TO 'test'@'host'
 ### Run the program
 python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 <br>
 or run it in background <br>
-nohup python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 &
+nohup python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 &  
+
+nohup python3 binlogParser.py --host=192.168.210.23--port=3306 --user=repl --password=repl --serverId=10 --onlyTables=["table1"] --onlySchemas=["db1"] &
