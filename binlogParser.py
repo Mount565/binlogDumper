@@ -189,7 +189,7 @@ def get_arg_value(arglist, arg):
     try:
         opts, args = getopt.getopt(args=arglist, shortopts=None,
                                    longopts=["help", "host=", "port=", "user=", "password=", "sqlDir=", "serverId=",
-                                             "startFile=", "startPos=", "onlyTables=", "onlySchema="])
+                                             "startFile=", "startPos=", "onlyTables=", "onlySchemas="])
 
         for k, v in opts:
             if k == arg:
