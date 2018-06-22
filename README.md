@@ -25,6 +25,8 @@ ln -s /usr/local/bin/python3.5 /usr/bin/python3 <br>
 ln -s /usr/local/bin/pip3 /usr/bin/pip3
 ### Install mysql -replication
 pip3 install mysql-replication
+### Grant the following privileges to account test
+GRANT REPLICATION SLAVE, REPLICATION CLIENT, SELECT ON *.* TO 'test'@'host'
 ### Run the program
 python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 <br>
 or run it in background <br>
