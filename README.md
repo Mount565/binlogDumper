@@ -28,8 +28,14 @@ pip3 install mysql-replication
 ### Grant the following privileges to account test
 GRANT REPLICATION SLAVE, REPLICATION CLIENT, SELECT ON \*.\* TO 'test'@'host'
 ### Run the program
+
 python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 <br>
 or run it in background <br>
 nohup python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 &  
 
 nohup python3 binlogParser.py --host=192.168.210.23--port=3306 --user=repl --password=repl --serverId=10 --onlyTables=["table1"] --onlySchemas=["db1"] &
+
+Note: --serverId is the master's server_id , you can get it by executing select @@global.server_id; on the master
+
+### filter out the sql statements you want  
+./find_gtid.sh rollback_2018-07-26.sql d5902ad8-ec43-11e7-9df7-5254006b29ec:4567774
