@@ -36,6 +36,9 @@ class BinlogDump(object):
         self.bin_log_file = startFile
         self.start_position = startPos
         self.server_id = serverId
+        
+        if self.bin_log_file and not self.start_position:
+            self.start_position=4
 
         # create directory to store sql files generated
         if not sqlDir:
