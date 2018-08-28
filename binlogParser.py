@@ -13,7 +13,7 @@ from pymysqlreplication.row_event import UpdateRowsEvent, WriteRowsEvent, Delete
 # This script by default dump all the binlog events in the current binlog file.
 
 class BinlogDump(object):
-    def __init__(self, connectionStr, serverId, sqlDir=None, startFile=None, startPos=None, onlyTables=None,
+    def __init__(self, connectionStr, serverId, sqlDir=None,gtid=None, startFile=None, startPos=None, onlyTables=None,
                  onlySchemas=None):
 
         today = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -37,7 +37,7 @@ class BinlogDump(object):
         self.start_position = startPos
         self.server_id = serverId
         
-        if self.bin_log_file and not self.start_position:
+        if self.bin_log_file and self.start_position is None :
             self.start_position=4
 
         # create directory to store sql files generated
@@ -51,6 +51,7 @@ class BinlogDump(object):
                 os.mkdir(sqlDir)
 
         self.sqlDir = sqlDir
+        self.gtid = gtid
         # the file holds rollback sql(DML)
         self.rollback_sql = os.path.join(self.sqlDir, "rollback_%s.sql" % today)
 
@@ -137,6 +138,15 @@ class BinlogDump(object):
             elif isinstance(binlogevent, QueryEvent):
                 pass
             else:
+                if self.gtid and gtid != self.gtid:
+                    if gtid.split(":")[1] > self.gtid.split(":")[1]:
+                        print("All sqls for gtid:"+gtid+" Filtered")
+                        #break 
+                        os._exit(0)
+                   # print("skiped gtid : " + gtid + ", self.gtid is :" + self.gtid)
+                    #time.sleep(1)
+                    continue
+
                 info = "# time: %s , binlog file:%s,binlog position:%s,GTID:%s" % (
                     datetime.datetime.fromtimestamp(binlogevent.timestamp)
                         .isoformat(), stream.log_file, stream.log_pos, gtid)
@@ -179,6 +189,7 @@ command line args
 --password
 --serverId
 
+--gtid    ## only fetch sqls for the specific gtid
 --sqlDir
 --startFile
 --startPos
@@ -191,11 +202,12 @@ command line args
 def get_arg_value(arglist, arg):
     try:
         opts, args = getopt.getopt(args=arglist, shortopts=None,
-                                   longopts=["help", "host=", "port=", "user=", "password=", "sqlDir=", "serverId=",
+                                   longopts=["help", "host=", "port=", "user=", "password=","gtid=", "sqlDir=", "serverId=",
                                              "startFile=", "startPos=", "onlyTables=", "onlySchemas="])
 
         for k, v in opts:
             if k == arg:
+                print(v)
                 return v
 
     except getopt.GetoptError:
@@ -215,6 +227,7 @@ def usage():
     print(
         "    --sqlDir      # the directory to store the generated sql file and rollback sql file,default same directory as this program")
     print("    --startFile   # the binlog file to start ")
+    print("    --gtid        # filter sqls belong to the gtid ")
     print("    --startPos    # the position of the file to start to dump")
     print("    --onlyTables  # only dump sqls that change these tables")
     print("    --onlySchemas # only dump sqls that executed on these schemas")
@@ -240,7 +253,7 @@ if __name__ == '__main__':
     con_string = {'host': get_arg_value(argv, "--host"), 'port': int(get_arg_value(argv, "--port")),
                   'user': get_arg_value(argv, "--user"), 'passwd': get_arg_value(argv, "--password")}
 
-    dumper = BinlogDump(connectionStr=con_string, sqlDir=get_arg_value(argv, "--sqlDir"),
+    dumper = BinlogDump(connectionStr=con_string, sqlDir=get_arg_value(argv, "--sqlDir"),gtid=get_arg_value(argv, "--gtid"),
                         serverId=int(get_arg_value(argv, "--serverId")), startFile=get_arg_value(argv, "--startFile"),
                         startPos=get_arg_value(argv, "--startPos"), onlySchemas=get_arg_value(argv, "--onlySchemas"),
                         onlyTables=get_arg_value(argv, "--onlyTables"))
