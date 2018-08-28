@@ -207,7 +207,7 @@ def get_arg_value(arglist, arg):
 
         for k, v in opts:
             if k == arg:
-                print(v)
+                #print(v)
                 return v
 
     except getopt.GetoptError:
