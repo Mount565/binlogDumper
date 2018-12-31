@@ -141,7 +141,13 @@ class BinlogDump(object):
                 gtid = binlogevent.gtid
 
             elif isinstance(binlogevent, QueryEvent):
-                pass
+                info = "# time: %s , binlog file:%s,binlog position:%s,GTID:%s" % (
+                    datetime.datetime.fromtimestamp(binlogevent.timestamp)
+                        .isoformat(), stream.log_file, stream.log_pos, gtid)
+                sql = binlogevent.query
+                self.append_sql_to_file(self.bin_sql, info + "\n")
+                self.append_sql_to_file(self.bin_sql, sql + "\r\n")
+                continue
             else:
                 if self.gtid and gtid != self.gtid:
                     if gtid.split(":")[1] > self.gtid.split(":")[1]:
