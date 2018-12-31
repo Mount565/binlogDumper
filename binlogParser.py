@@ -14,7 +14,7 @@ from pymysqlreplication.row_event import UpdateRowsEvent, WriteRowsEvent, Delete
 
 class BinlogDump(object):
     def __init__(self, connectionStr, serverId, sqlDir=None,gtid=None, startFile=None, startPos=None, onlyTables=None,
-                 onlySchemas=None):
+                 onlySchemas=None,onlyEvents=None):
 
         today = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -196,6 +196,10 @@ command line args
 --onlyTables=["t1","t2"]
 --onlySchemas=["schema1","schema2"]
 
+Specify the events you want to filter. all possible events,please refer to mysql internel doc
+
+--onlyEvents=["UpdateRowsEvent", "WriteRowsEvent", "DeleteRowsEvent", "QueryEvent"]
+
 '''
 
 
@@ -231,6 +235,7 @@ def usage():
     print("    --startPos    # the position of the file to start to dump")
     print("    --onlyTables  # only dump sqls that change these tables")
     print("    --onlySchemas # only dump sqls that executed on these schemas")
+    print("    --onlyEvents  # only dump sqls that executed on these schemas")
 
 # start a thread to rotate output sql file everyday
 def rotate_thread(d):
@@ -256,7 +261,7 @@ if __name__ == '__main__':
     dumper = BinlogDump(connectionStr=con_string, sqlDir=get_arg_value(argv, "--sqlDir"),gtid=get_arg_value(argv, "--gtid"),
                         serverId=int(get_arg_value(argv, "--serverId")), startFile=get_arg_value(argv, "--startFile"),
                         startPos=get_arg_value(argv, "--startPos"), onlySchemas=get_arg_value(argv, "--onlySchemas"),
-                        onlyTables=get_arg_value(argv, "--onlyTables"))
+                        onlyTables=get_arg_value(argv, "--onlyTables"),onlyEvents=get_arg_value(argv, "--onlyEvents"))
     t = threading.Thread(target=rotate_thread, name="rotate_thread",args=(dumper,))
     t.start()
 
