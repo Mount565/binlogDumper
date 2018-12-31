@@ -14,7 +14,7 @@ from pymysqlreplication.row_event import UpdateRowsEvent, WriteRowsEvent, Delete
 
 class BinlogDump(object):
     def __init__(self, connectionStr, serverId, sqlDir=None,gtid=None, startFile=None, startPos=None, onlyTables=None,
-                 onlySchemas=None):
+                 onlySchemas=None,onlyEvents=None):
 
         today = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -23,13 +23,27 @@ class BinlogDump(object):
         # Change the host and user credential to fit your database
         # mysql_strings = {'host': '192.168.216.146', 'port': 3306, 'user': 'test', 'passwd': 'test'}
         self.connect_strings = connectionStr
-        self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
+        
+        if onlyEvents is not None:
+           # print(eval(onlyEvents))
+            self.only_events = eval(onlyEvents)
+            if GtidEvent not in self.only_events:
+               self.only_events.append(GtidEvent) # Always catch GtidEvent
+        else:
+            # the default events to catch
+            self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent,
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
+        if onlyTables is not None:
+           self.only_tables = onlyTables.split(',')
+        else:
+           self.only_tables = None
 
-        self.only_tables = onlyTables
+        if onlySchemas is not None:
+           self.only_schemas = onlySchemas.split(',')
+        else:
+           self.only_schemas = None
 
-        self.only_schemas = onlySchemas
 
         # The binlog file and position to start to replicate with
         # You may need to change these two variables
@@ -136,7 +150,13 @@ class BinlogDump(object):
                 gtid = binlogevent.gtid
 
             elif isinstance(binlogevent, QueryEvent):
-                pass
+                info = "# time: %s , binlog file:%s,binlog position:%s,GTID:%s" % (
+                    datetime.datetime.fromtimestamp(binlogevent.timestamp)
+                        .isoformat(), stream.log_file, stream.log_pos, gtid)
+                sql = binlogevent.query
+                self.append_sql_to_file(self.bin_sql, info + "\n")
+                self.append_sql_to_file(self.bin_sql, sql + "\r\n")
+                continue
             else:
                 if self.gtid and gtid != self.gtid:
                     if gtid.split(":")[1] > self.gtid.split(":")[1]:
@@ -193,8 +213,12 @@ command line args
 --sqlDir
 --startFile
 --startPos
---onlyTables=["t1","t2"]
---onlySchemas=["schema1","schema2"]
+--onlyTables="t1","t2"
+--onlySchemas="schema1","schema2"
+
+Specify the events you want to filter. all possible events,please refer to mysql internel doc
+Supported events are GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent, BeginLoadQueryEvent, ExecuteLoadQueryEvent
+--onlyEvents=[UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent]
 
 '''
 
@@ -203,7 +227,7 @@ def get_arg_value(arglist, arg):
     try:
         opts, args = getopt.getopt(args=arglist, shortopts=None,
                                    longopts=["help", "host=", "port=", "user=", "password=","gtid=", "sqlDir=", "serverId=",
-                                             "startFile=", "startPos=", "onlyTables=", "onlySchemas="])
+                                             "startFile=", "startPos=", "onlyTables=", "onlySchemas=","onlyEvents="])
 
         for k, v in opts:
             if k == arg:
@@ -231,6 +255,7 @@ def usage():
     print("    --startPos    # the position of the file to start to dump")
     print("    --onlyTables  # only dump sqls that change these tables")
     print("    --onlySchemas # only dump sqls that executed on these schemas")
+    print("    --onlyEvents  # only dump specified binlog events")
 
 # start a thread to rotate output sql file everyday
 def rotate_thread(d):
@@ -256,7 +281,7 @@ if __name__ == '__main__':
     dumper = BinlogDump(connectionStr=con_string, sqlDir=get_arg_value(argv, "--sqlDir"),gtid=get_arg_value(argv, "--gtid"),
                         serverId=int(get_arg_value(argv, "--serverId")), startFile=get_arg_value(argv, "--startFile"),
                         startPos=get_arg_value(argv, "--startPos"), onlySchemas=get_arg_value(argv, "--onlySchemas"),
-                        onlyTables=get_arg_value(argv, "--onlyTables"))
+                        onlyTables=get_arg_value(argv, "--onlyTables"),onlyEvents=get_arg_value(argv, "--onlyEvents"))
     t = threading.Thread(target=rotate_thread, name="rotate_thread",args=(dumper,))
     t.start()
 
