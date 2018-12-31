@@ -34,7 +34,11 @@ or run it in background <br>
 ```
 nohup python3  binlogParser.py --host=192.168.216.146 --port=3306 --user=test --password=test --serverId=1 &  
 
-nohup python3 binlogParser.py --host=192.168.210.23--port=3306 --user=repl --password=repl --serverId=10 --onlyTables=["table1"] --onlySchemas=["db1"] &
+nohup python3 binlogParser.py --host=192.168.210.23--port=3306 --user=repl --password=repl --serverId=10 --onlyTables="table1","table2" --onlySchemas="db1","db2" &
+```
+Catch only specified binlog events
+```
+nohup python3 binlogDumper-master/binlogParser.py --host=11.0.1.17 --port=3306 --user=repl --password=repl --serverId=17 --onlyEvents=[QueryEvent,GtidEvent] --sqlDir=/mnt/resource/sql_logs &
 ```
 You can also filter sqls for a specific GTID
 ```
