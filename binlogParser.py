@@ -23,9 +23,14 @@ class BinlogDump(object):
         # Change the host and user credential to fit your database
         # mysql_strings = {'host': '192.168.216.146', 'port': 3306, 'user': 'test', 'passwd': 'test'}
         self.connect_strings = connectionStr
-        self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
+        
+        if onlyEvents is None:
+           # the default events to catch
+           self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
+        else:
+            self.only_events = onlyEvents
 
         self.only_tables = onlyTables
 
@@ -197,7 +202,7 @@ command line args
 --onlySchemas=["schema1","schema2"]
 
 Specify the events you want to filter. all possible events,please refer to mysql internel doc
-
+Supported events are GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent, BeginLoadQueryEvent, ExecuteLoadQueryEvent
 --onlyEvents=["UpdateRowsEvent", "WriteRowsEvent", "DeleteRowsEvent", "QueryEvent"]
 
 '''
@@ -207,7 +212,7 @@ def get_arg_value(arglist, arg):
     try:
         opts, args = getopt.getopt(args=arglist, shortopts=None,
                                    longopts=["help", "host=", "port=", "user=", "password=","gtid=", "sqlDir=", "serverId=",
-                                             "startFile=", "startPos=", "onlyTables=", "onlySchemas="])
+                                             "startFile=", "startPos=", "onlyTables=", "onlySchemas=","onlyEvents="])
 
         for k, v in opts:
             if k == arg:
@@ -235,7 +240,7 @@ def usage():
     print("    --startPos    # the position of the file to start to dump")
     print("    --onlyTables  # only dump sqls that change these tables")
     print("    --onlySchemas # only dump sqls that executed on these schemas")
-    print("    --onlyEvents  # only dump sqls that executed on these schemas")
+    print("    --onlyEvents  # only dump specified binlog events")
 
 # start a thread to rotate output sql file everyday
 def rotate_thread(d):
