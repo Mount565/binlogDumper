@@ -24,17 +24,26 @@ class BinlogDump(object):
         # mysql_strings = {'host': '192.168.216.146', 'port': 3306, 'user': 'test', 'passwd': 'test'}
         self.connect_strings = connectionStr
         
-        if onlyEvents is None:
-           # the default events to catch
-           self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
+        if onlyEvents is not None:
+           # print(eval(onlyEvents))
+            self.only_events = eval(onlyEvents)
+            if GtidEvent not in self.only_events:
+               self.only_events.append(GtidEvent) # Always catch GtidEvent
+        else:
+            # the default events to catch
+            self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
+        if onlyTables is not None:
+           self.only_tables = eval(onlyTables)
         else:
-            self.only_events = onlyEvents
+           self.only_tables = None
 
-        self.only_tables = onlyTables
+        if onlySchemas is not None:
+           self.only_schemas = eval(onlySchemas)
+        else:
+           self.only_schemas = None
 
-        self.only_schemas = onlySchemas
 
         # The binlog file and position to start to replicate with
         # You may need to change these two variables
@@ -209,7 +218,7 @@ command line args
 
 Specify the events you want to filter. all possible events,please refer to mysql internel doc
 Supported events are GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent, BeginLoadQueryEvent, ExecuteLoadQueryEvent
---onlyEvents=["UpdateRowsEvent", "WriteRowsEvent", "DeleteRowsEvent", "QueryEvent"]
+--onlyEvents=[UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent]
 
 '''
 
