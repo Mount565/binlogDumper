@@ -35,12 +35,12 @@ class BinlogDump(object):
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
         if onlyTables is not None:
-           self.only_tables = tuple(onlyTables)
+           self.only_tables = onlyTables.split(',')
         else:
            self.only_tables = None
 
         if onlySchemas is not None:
-           self.only_schemas = tuple(onlySchemas)
+           self.only_schemas = onlySchemas.split(',')
         else:
            self.only_schemas = None
 
@@ -213,8 +213,8 @@ command line args
 --sqlDir
 --startFile
 --startPos
---onlyTables=["t1","t2"]
---onlySchemas=["schema1","schema2"]
+--onlyTables="t1","t2"
+--onlySchemas="schema1","schema2"
 
 Specify the events you want to filter. all possible events,please refer to mysql internel doc
 Supported events are GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent, BeginLoadQueryEvent, ExecuteLoadQueryEvent
