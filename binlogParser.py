@@ -31,7 +31,7 @@ class BinlogDump(object):
                self.only_events.append(GtidEvent) # Always catch GtidEvent
         else:
             # the default events to catch
-            self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent, QueryEvent,
+            self.only_events = [GtidEvent, UpdateRowsEvent, WriteRowsEvent, DeleteRowsEvent,
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
         if onlyTables is not None:
