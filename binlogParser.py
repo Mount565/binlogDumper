@@ -35,12 +35,12 @@ class BinlogDump(object):
                             BeginLoadQueryEvent,
                             ExecuteLoadQueryEvent]
         if onlyTables is not None:
-           self.only_tables = eval(onlyTables)
+           self.only_tables = tuple(onlyTables)
         else:
            self.only_tables = None
 
         if onlySchemas is not None:
-           self.only_schemas = eval(onlySchemas)
+           self.only_schemas = tuple(onlySchemas)
         else:
            self.only_schemas = None
 
