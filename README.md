@@ -45,7 +45,8 @@ You can also filter sqls for a specific GTID
 python3 binlogDumper-master/binlogParser.py --host=11.0.1.17 --port=3306 --user=repl --password=repl --serverId=17  --sqlDir=/mnt/resource/sql_logs --gtid='b2d64755-2f09-11e7-8aeb-0017fa00d14d:23544245' --startFile='binlog.000296'
 ```
 
-Note: --serverId is the master's server_id , you can get it by executing select @@global.server_id; on the master
+Note: --serverId is the master's server_id , you can get it by executing select @@global.server_id; on the master  
+--sqlDir=/mnt/resource/sql_logs  be sure you have **write permission** for this directory
 
 ### Filter out the sql statements you want  
 ./find_gtid.sh rollback_2018-07-26.sql d5902ad8-ec43-11e7-9df7-5254006b29ec:4567774
