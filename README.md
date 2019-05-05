@@ -38,11 +38,11 @@ nohup python3 binlogParser.py --host=192.168.210.23--port=3306 --user=repl --pas
 ```
 Catch only specified binlog events
 ```
-nohup python3 binlogDumper-master/binlogParser.py --host=11.0.1.17 --port=3306 --user=repl --password=repl --serverId=17 --onlyEvents=[QueryEvent,GtidEvent] --sqlDir=/mnt/resource/sql_logs &
+nohup python3 binlogDumper-master/binlogParser.py --host=17.0.1.17 --port=3306 --user=repl --password=repl --serverId=17 --onlyEvents=[QueryEvent,GtidEvent] --sqlDir=/mnt/resource/sql_logs &
 ```
 You can also filter sqls for a specific GTID
 ```
-python3 binlogDumper-master/binlogParser.py --host=11.0.1.17 --port=3306 --user=repl --password=repl --serverId=17  --sqlDir=/mnt/resource/sql_logs --gtid='b2d64755-2f09-11e7-8aeb-0017fa00d14d:23544245' --startFile='binlog.000296'
+python3 binlogDumper-master/binlogParser.py --host=17.0.1.17 --port=3306 --user=repl --password=repl --serverId=17  --sqlDir=/mnt/resource/sql_logs --gtid='b2d64755-2f09-11e7-8aeb-0017fa00d14d:23544245' --startFile='binlog.000296'
 ```
 
 Note: --serverId is the master's server_id , you can get it by executing select @@global.server_id; on the master  
